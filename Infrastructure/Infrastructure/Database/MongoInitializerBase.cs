@@ -5,15 +5,15 @@ using MongoDB.Driver;
 
 namespace Infrastructure.Database
 {
-    public abstract class MongoInitializer : IMongoInitializerBase
+    public abstract class MongoInitializerBase : IMongoInitializerBase
     {
         private static MongoClient mongoClient;
         private static MongoServer mongoServer;
-        private static string dbPrefix;
+        protected static string dbPrefix;
 
-        protected MongoInitializer()
+        protected MongoInitializerBase()
         {
-            IninializeDatabase(ConfigurationManager.ConnectionStrings["MongoDbConnectionString"].ConnectionString);
+            InitializeDatabase(ConfigurationManager.ConnectionStrings["MongoDbConnectionString"].ConnectionString);
             CreateIndexes();
             InitIncrementalIdCounters();
         }
@@ -27,7 +27,7 @@ namespace Infrastructure.Database
         }
 
 
-        private void IninializeDatabase(string connectionString)
+        private void InitializeDatabase(string connectionString)
         {
             // Specify, that null values should be ignored by BsonSerializer
             var p = new ConventionPack

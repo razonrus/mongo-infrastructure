@@ -8,10 +8,10 @@ using Moq;
 
 namespace TestInfrastructure
 {
-    public class MockMongoWrapper
+    public class MockMongoWrapper<TInitializer> where TInitializer : class
     {
         private readonly Mock<MongoServer> server;
-        private readonly Mock<IMongoInitializerBase> mock;
+        private readonly Mock<TInitializer> mock;
 
         public MockMongoWrapper()
         {
@@ -19,7 +19,7 @@ namespace TestInfrastructure
             server = new Mock<MongoServer>(new MongoServerSettings());
             server.Setup(s => s.IsDatabaseNameValid(It.IsAny<string>(), out message)).Returns(true);
 
-            mock = new Mock<IMongoInitializerBase>();
+            mock = new Mock<TInitializer>();
         }
 
         private static Mock<MongoDatabase> GetDatabase(Mock<MongoServer> server)
@@ -38,7 +38,7 @@ namespace TestInfrastructure
             return database;
         }
 
-        public MockMongoWrapper SetupDatabase<T>(Expression<Func<IMongoInitializerBase, T>> databaseGetter, Func<MockMongoDatabaseWrapper, MockMongoDatabaseWrapper> action = null)
+        public MockMongoWrapper<TInitializer> SetupDatabase<T>(Expression<Func<TInitializer, T>> databaseGetter, Func<MockMongoDatabaseWrapper, MockMongoDatabaseWrapper> action = null)
             where T : MongoDatabaseWrapperBase
         {
             Mock<MongoDatabase> database = GetDatabase(server);
@@ -53,7 +53,7 @@ namespace TestInfrastructure
             return this;
         }
 
-        public IMongoInitializerBase Object
+        public TInitializer Object
         {
             get { return mock.Object; }
         }

@@ -83,8 +83,9 @@ namespace Infrastructure.Extensions
 
         public static WriteConcernResult UpdateById<T>(this MongoCollection<T> collection, BsonValue id, Func<UpdateBuilder<T>, UpdateBuilder<T>> update, MongoUpdateOptions options = null)
         {
-            if (options == null) options = new MongoUpdateOptions();
-            return collection.Update(Query.EQ(IdName, id), update(new UpdateBuilder<T>()), options);
+            id = GetId<T>(id);
+
+            return collection.Update(Query.EQ(IdName, id), update(new UpdateBuilder<T>()), options ?? new MongoUpdateOptions());
         }
 
         public static WriteConcernResult UpdateArrayById<T, TItem>(this MongoCollection<T> collection, BsonValue id,
