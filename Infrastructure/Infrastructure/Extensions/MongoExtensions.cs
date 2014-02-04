@@ -2,14 +2,17 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Castle.DynamicProxy;
+using Infrastructure.Interceptors;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 
-namespace Infrastructure
+namespace Infrastructure.Extensions
 {
     public static class MongoExtensions
     {
@@ -82,6 +85,32 @@ namespace Infrastructure
         {
             if (options == null) options = new MongoUpdateOptions();
             return collection.Update(Query.EQ(IdName, id), update(new UpdateBuilder<T>()), options);
+        }
+
+        public static WriteConcernResult UpdateArrayById<T, TItem>(this MongoCollection<T> collection, BsonValue id,
+            Expression<Func<T, IEnumerable<TItem>>> array, IMongoQuery elemSelector,
+            Func<UpdateBuilder, Expression<Func<T, IEnumerable<TItem>>>, UpdateBuilder> update)
+        {
+            id = GetId<T>(id);
+
+            return collection.Update(
+                Query.And(
+                    Query.EQ("_id", id),
+                    QueryExtensions.ElemMatch(array,
+                        elemSelector
+                        )
+                    ),
+                update(new UpdateBuilder(), array)
+                );
+        }
+
+        private static BsonValue GetId<T>(BsonValue id)
+        {
+            if (typeof(T).GetProperties()
+                .Any(x => (x.Name == "Id" || x.GetCustomAttributes(typeof(BsonIdAttribute), true).Any())
+                          && x.GetCustomAttributes(typeof(BsonRepresentationAttribute), true).Any()))
+                id = new ObjectId(id.ToString());
+            return id;
         }
 
         public static void UpdateOrInsert<T>(this MongoCollection<T> collection, T prototype, MongoUpdateOptions options = null)

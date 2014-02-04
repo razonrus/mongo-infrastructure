@@ -4,7 +4,7 @@ using System.Threading;
 using Castle.DynamicProxy;
 using NLog;
 
-namespace Infrastructure
+namespace Infrastructure.Interceptors
 {
     class RetryingInterceptor : IInterceptor
     {
