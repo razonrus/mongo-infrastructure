@@ -5,6 +5,8 @@ Extensions for mongodb driver, infrastructure for mocking mongo objects
 
 .sln file here: Infrastructure/Infrastructure.sln
 
+nuget package: https://www.nuget.org/packages/MongoDbInfrastructure
+
 ====================
 
 репозиторий включает в себя: 
