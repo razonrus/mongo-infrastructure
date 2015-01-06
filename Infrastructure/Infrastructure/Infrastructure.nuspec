@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>MongoDbInfrastructure</id>
-    <version>1.0.0</version>
+    <version>1.0.0.1</version>
 	 <title>MongoDbInfrastructure</title>
     <authors>razon</authors>
     <owners>razon</owners>
@@ -12,8 +12,5 @@
     <releaseNotes>First version of nuget package.</releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>mongodb</tags>
-    <dependencies>
-      <dependency id="SampleDependency" version="1.0" />
-    </dependencies>
   </metadata>
 </package>
