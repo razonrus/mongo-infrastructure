@@ -17,4 +17,6 @@ nuget package: https://www.nuget.org/packages/MongoDbInfrastructure
 
 ====================
 
-**Обратите внимание**, если вы используете подключение с логином паролем то в MongoInitializer не добавляйте постфикс к базе здесь: " return new SampleDatabase(GetDatabase(dbPrefix));", т.к. она не будет создана автоматом (как при анонимном входе) и вы получите ошибку "not authorized" (thnks to sk.kirill for warning)
+**Обратите внимание**, если вы используете подключение с логином паролем то в MongoInitializer не добавляйте постфикс к базе здесь: " return new SampleDatabase(GetDatabase(dbPrefix));", т.к. она не будет создана автоматом (как при анонимном входе) и вы получите ошибку "not authorized" 
+
+(thnks to *sk.kirill* for warning)
