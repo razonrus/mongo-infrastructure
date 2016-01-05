@@ -6,23 +6,6 @@ using Moq;
 
 namespace TestInfrastructure
 {
-//    public class MongoDatabaseBaseTests
-//    {
-//        protected static MockMongoWrapper MockMongoDatabase()
-//        {
-//            return new MockMongoWrapper();
-//        }
-//
-//        protected static IMongoDatabaseInitializer MockMongoDatabaseUsers()
-//        {
-//            return MockMongoDatabase().SetupDatabase(x => x.UsersDb, x => x.SetupCollection<Badge>()
-//                                                                           .SetupCollection<User>()
-//                                                                           .SetupCollection<UserTip>()
-//                )
-//                                      .Object;
-//        }
-//    }
-
     public class MockMongoDatabaseWrapper
     {
         private readonly Mock<MongoDatabase> database;
