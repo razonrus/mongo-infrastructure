@@ -88,6 +88,15 @@ namespace Infrastructure.Extensions
             return collection.Update(Query.EQ(IdName, id), update(new UpdateBuilder<T>()), options ?? new MongoUpdateOptions());
         }
 
+          public static WriteConcernResult UpdateByIdOrInsert<T>(this MongoCollection<T> collection, BsonValue id,
+             Func<UpdateBuilder<T>, UpdateBuilder<T>> update) where T : new()
+         {
+            return collection.UpdateById(id, update, new MongoUpdateOptions
+            {
+                Flags = UpdateFlags.Upsert
+            });
+         }
+
         public static WriteConcernResult UpdateArrayById<T, TItem>(this MongoCollection<T> collection, BsonValue id,
             Expression<Func<T, IEnumerable<TItem>>> array, IMongoQuery elemSelector,
             Func<UpdateBuilder, Expression<Func<T, IEnumerable<TItem>>>, UpdateBuilder> update)
