@@ -28,7 +28,7 @@ namespace TestInfrastructure
             {
                 GuidRepresentation = GuidRepresentation.Standard,
                 ReadEncoding = new UTF8Encoding(),
-                ReadPreference = new ReadPreference(),
+                ReadPreference = new ReadPreference(ReadPreferenceMode.Nearest),
                 WriteConcern = new WriteConcern(),
                 WriteEncoding = new UTF8Encoding()
             };

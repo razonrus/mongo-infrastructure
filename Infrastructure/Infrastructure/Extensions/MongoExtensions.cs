@@ -122,7 +122,7 @@ namespace Infrastructure.Extensions
             }
             
             var doc = new BsonDocument();
-            var wr = BsonWriter.Create(doc);
+            var wr = new BsonDocumentWriter(doc);
             BsonSerializer.Serialize(wr, prototype);
             var update = new UpdateBuilder();
             foreach (var el in doc)
