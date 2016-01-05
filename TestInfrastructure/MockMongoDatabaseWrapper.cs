@@ -23,7 +23,8 @@ namespace TestInfrastructure
                 ReadEncoding = new UTF8Encoding(),
                 ReadPreference = new ReadPreference(ReadPreferenceMode.Nearest),
                 WriteConcern = new WriteConcern(),
-                WriteEncoding = new UTF8Encoding()
+                WriteEncoding = new UTF8Encoding(),
+                ReadConcern = new ReadConcern()
             };
 
             var collection = new Mock<MongoCollection<T>>(database.Object, "test", mongoCollectionSettings);

@@ -18,6 +18,7 @@ namespace TestInfrastructure
             string message;
             server = new Mock<MongoServer>(new MongoServerSettings());
             server.Setup(s => s.IsDatabaseNameValid(It.IsAny<string>(), out message)).Returns(true);
+            server.SetupGet(x => x.Settings).Returns(new MongoServerSettings());
 
             mock = new Mock<TInitializer>();
         }
@@ -35,6 +36,9 @@ namespace TestInfrastructure
             var database = new Mock<MongoDatabase>(server.Object, "test", mongoDatabaseSettings);
             string message;
             database.Setup(x => x.IsCollectionNameValid(It.IsAny<string>(), out message)).Returns(true);
+            database.SetupGet(x => x.Server).Returns(server.Object);
+            database.SetupGet(x => x.Settings).Returns(mongoDatabaseSettings);
+            database.SetupGet(x => x.Name).Returns("test");
             return database;
         }
 
