@@ -185,3 +185,4 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 Infrastructure/Infrastructure/NuGet.exe
+*.nupkg
