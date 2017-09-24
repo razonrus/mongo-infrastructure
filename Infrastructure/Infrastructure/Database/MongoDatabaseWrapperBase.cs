@@ -4,11 +4,11 @@ namespace Infrastructure.Database
 {
     public abstract class MongoDatabaseWrapperBase
     {
-        protected MongoDatabaseWrapperBase(MongoDatabase db)
+        protected MongoDatabaseWrapperBase(IMongoDatabase db)
         {
             Database = db;
         }
 
-        public MongoDatabase Database { get; private set; }
+        public IMongoDatabase Database { get; private set; }
     }
 }

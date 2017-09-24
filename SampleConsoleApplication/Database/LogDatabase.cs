@@ -7,8 +7,8 @@ namespace SampleConsoleApplication.Database
 {
     public class LogDatabase : MongoDatabaseWrapperBase
     {
-        public LogDatabase(MongoDatabase db) : base(db) { }
+        public LogDatabase(IMongoDatabase db) : base(db) { }
 
-        public MongoCollection<Log> Logs { get { return Database.GetRetryCollection<Log>(); } }
+        public IMongoCollection<Log> Logs => Database.GetRetryCollection<Log>();
     }
 }

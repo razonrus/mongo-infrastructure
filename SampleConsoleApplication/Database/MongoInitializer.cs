@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Database;
 using Infrastructure.Extensions;
-using MongoDB.Driver.Builders;
+using MongoDB.Driver;
 using SampleConsoleApplication.Database.Domain;
 
 namespace SampleConsoleApplication.Database
@@ -15,7 +15,7 @@ namespace SampleConsoleApplication.Database
     {
         protected override void CreateIndexes()
         {
-            SampleDb.Articles.EnsureIndex(IndexKeys<Article>.Ascending(x => x.AuthorId));
+            SampleDb.Articles.Indexes.CreateOne(Builders<Article>.IndexKeys.Ascending(x => x.AuthorId));
         }
 
         protected override void InitIncrementalIdCounters()
@@ -23,19 +23,8 @@ namespace SampleConsoleApplication.Database
             SampleDb.Users.InitIncrementalIdCounter(0);
         }
 
-        public SampleDatabase SampleDb
-        {
-            get
-            {
-                return new SampleDatabase(GetDatabase(dbPrefix + "-sample"));
-            }
-        }
-        public LogDatabase LogDb
-        {
-            get
-            {
-                return new LogDatabase(GetDatabase(dbPrefix + "-sample-log"));
-            }
-        }
+        public SampleDatabase SampleDb => new SampleDatabase(GetDatabase(DbPrefix + "-sample"));
+
+        public LogDatabase LogDb => new LogDatabase(GetDatabase(DbPrefix + "-sample-log"));
     }
 }

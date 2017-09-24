@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Infrastructure.Extensions;
-using MongoDB.Driver.Builders;
+using MongoDB.Driver;
 using SampleConsoleApplication.Database;
 using SampleConsoleApplication.Database.Domain;
 
@@ -21,23 +21,21 @@ namespace SampleConsoleApplication.Commands
         {
             var article = mongoInitializer.SampleDb.Articles.FindOneById(articleId);
 
-            var count = article.Comments != null
-                ? article.Comments.Count(x => x.UserId == userId)
-                : 0;
+            var count = article.Comments?.Count(x => x.UserId == userId) ?? 0;
 
 
             //need for demonstrate configuring multiple collections in test
             mongoInitializer.SampleDb.Users.UpdateById(userId, x => x.Inc(u => u.CommentsCount, count));
 
             //need for demonstrate configuring multiple databases in test
-            mongoInitializer.LogDb.Logs.Insert(new Log());
+            mongoInitializer.LogDb.Logs.InsertOne(new Log());
 
             return count;
         }
 
         public int ByAuthor(long authorId, long userId)
         {
-            var articles = mongoInitializer.SampleDb.Articles.Find(Query.EQ("AuthorId", authorId)).ToList();
+            var articles = mongoInitializer.SampleDb.Articles.Find(Builders<Article>.Filter.Eq("AuthorId", authorId)).ToList();
 
             return articles.SelectMany(x => x.Comments).Where(x => x != null).Count(x => x.UserId == userId);
         }

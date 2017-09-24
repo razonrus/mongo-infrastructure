@@ -8,8 +8,7 @@ namespace Infrastructure.Database
     public abstract class MongoInitializerBase : IMongoInitializerBase
     {
         private static MongoClient mongoClient;
-        private static MongoServer mongoServer;
-        protected static string dbPrefix;
+        protected static string DbPrefix;
 
         protected MongoInitializerBase()
         {
@@ -38,16 +37,15 @@ namespace Infrastructure.Database
             ConventionRegistry.Register("all", p, t => true);
 
             var urlBuilder = new MongoUrlBuilder(connectionString);
-            dbPrefix = urlBuilder.DatabaseName;
-            if (string.IsNullOrWhiteSpace(dbPrefix))
+            DbPrefix = urlBuilder.DatabaseName;
+            if (string.IsNullOrWhiteSpace(DbPrefix))
                 throw new ArgumentException("Connection string must include database name prefix. E.g. mongodb://mongodb01/staging");
             mongoClient = new MongoClient(connectionString);
-            mongoServer = mongoClient.GetServer();
         }
 
-        public MongoDatabase GetDatabase(string dbName)
+        public IMongoDatabase GetDatabase(string dbName)
         {
-            return mongoServer.GetDatabase(dbName);
+            return mongoClient.GetDatabase(dbName);
         }
     }
 

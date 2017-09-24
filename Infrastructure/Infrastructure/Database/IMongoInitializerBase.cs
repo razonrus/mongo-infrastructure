@@ -4,6 +4,6 @@ namespace Infrastructure.Database
 {
     public interface IMongoInitializerBase
     {
-        MongoDatabase GetDatabase(string dbName);
+        IMongoDatabase GetDatabase(string dbName);
     }
 }

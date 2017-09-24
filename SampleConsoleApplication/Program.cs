@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Infrastructure.Extensions;
+using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SampleConsoleApplication.Database;
 using SampleConsoleApplication.Database.Domain;
@@ -20,15 +21,15 @@ namespace SampleConsoleApplication
                 Id = MongoInitializer.SampleDb.Users.NewId()
             };
 
-            MongoInitializer.SampleDb.Users.Insert(user);
-            MongoInitializer.SampleDb.Articles.Insert(new Article
+            MongoInitializer.SampleDb.Users.InsertOne(user);
+            MongoInitializer.SampleDb.Articles.InsertOne(new Article
             {
                 AuthorId = user.Id
             });
             
             var article = MongoInitializer.SampleDb.Articles.AsQueryable().First(x => x.AuthorId == user.Id);
 
-            MongoInitializer.SampleDb.Articles.UpdateById(article.Id, x => x.PushAll(a => a.Comments, new List<Comment>
+            MongoInitializer.SampleDb.Articles.UpdateById(article.Id, x => x.PushEach(a => a.Comments, new List<Comment>
             {
                 new Comment(),
                 new Comment

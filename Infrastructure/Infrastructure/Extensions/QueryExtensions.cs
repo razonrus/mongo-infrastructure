@@ -4,25 +4,24 @@ using System.Linq.Expressions;
 using Infrastructure.StringBuilders;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
 
 namespace Infrastructure.Extensions
 {
     public static class QueryExtensions
     {
-        public static IMongoQuery ElemMatch<T, TItem>(Expression<Func<T, IEnumerable<TItem>>> expression, IMongoQuery query)
+        public static FilterDefinition<T> ElemMatch<T, TItem>(Expression<Func<T, IEnumerable<TItem>>> expression, FilterDefinition<T> query)
         {
-            return Query.ElemMatch(PropertyHelper.GetName(expression), query);
+            return Builders<T>.Filter.ElemMatch(PropertyHelper.GetName(expression), query);
         }
 
-        public static IMongoQuery ElemMatch<T>(Expression<Func<T, object>> expression, IMongoQuery query)
+        public static FilterDefinition<T> ElemMatch<T>(Expression<Func<T, object>> expression, FilterDefinition<T> query)
         {
-            return Query.ElemMatch(PropertyHelper.GetName(expression), query);
+            return Builders<T>.Filter.ElemMatch(PropertyHelper.GetName(expression), query);
         }
 
-        public static IMongoQuery EQ<T>(Expression<Func<T, object>> expression, BsonValue value)
+        public static FilterDefinition<T> EQ<T>(Expression<Func<T, object>> expression, BsonValue value)
         {
-            return Query.EQ(PropertyHelper.GetName(expression), value);
+            return Builders<T>.Filter.Eq(PropertyHelper.GetName(expression), value);
         }
     }
 }
