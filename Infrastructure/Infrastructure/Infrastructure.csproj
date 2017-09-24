@@ -62,6 +62,7 @@
     <Compile Include="Database\MongoDatabaseWrapperBase.cs" />
     <Compile Include="Database\MongoInitializerBase.cs" />
     <Compile Include="Database\IMongoInitializerBase.cs" />
+    <Compile Include="Extensions\UpdateHelper.cs" />
     <Compile Include="StringBuilders\NameForQueryBuilder.cs" />
     <Compile Include="StringBuilders\PropertyHelper.cs" />
     <Compile Include="Extensions\QueryExtensions.cs" />

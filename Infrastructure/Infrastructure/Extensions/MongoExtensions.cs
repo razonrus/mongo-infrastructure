@@ -1,15 +1,18 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Castle.DynamicProxy;
-using Infrastructure.Interceptors;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+
+#endregion
 
 namespace Infrastructure.Extensions
 {
@@ -17,16 +20,17 @@ namespace Infrastructure.Extensions
     {
         const string IdName = "_id";
         static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
+        static readonly ConcurrentDictionary<string, object> cache = new ConcurrentDictionary<string, object>();
 
         public static T FindOneById<T>(this IMongoCollection<T> col, BsonValue id)
         {
-            return col.Find(Builders<T>.Filter.Eq(IdName, GetId<T>(id))).SingleOrDefault();
+            return col.Find(FilterId<T>(id)).SingleOrDefault();
         }
+
         public static DeleteResult RemoveById<T>(this IMongoCollection<T> col, BsonValue id)
         {
-            return col.DeleteOne(Builders<T>.Filter.Eq(IdName, GetId<T>(id)));
+            return col.DeleteOne(FilterId<T>(id));
         }
-        static readonly ConcurrentDictionary<string, object> cache = new ConcurrentDictionary<string, object>();
 
         public static void InsertEnumerable<T>(this IMongoCollection<T> collection, IEnumerable<T> sequence)
         {
@@ -35,8 +39,9 @@ namespace Infrastructure.Extensions
         }
 
         /// <summary>
-        /// Returns unique incremental id. In order to work properly, you should call InitIncrementalIdCounter once before usage.
-        /// See MongoDatabaseInitializer constructor.
+        ///     Returns unique incremental id. In order to work properly, you should call InitIncrementalIdCounter once before
+        ///     usage.
+        ///     See MongoDatabaseInitializer constructor.
         /// </summary>
         /// <typeparam name="TDocument"></typeparam>
         /// <param name="collection"></param>
@@ -50,8 +55,8 @@ namespace Infrastructure.Extensions
                 IsUpsert = true,
                 ReturnDocument = ReturnDocument.After
             });
-            
-            return (long)res["value"];
+
+            return (long) res["value"];
         }
 
         public static void InitIncrementalIdCounter<TDocument>(this IMongoCollection<TDocument> collection, long initialValue = 10000)
@@ -59,7 +64,7 @@ namespace Infrastructure.Extensions
             var col = collection.Database.GetCollection<BsonDocument>("IncrementalIds");
             var existing = col.Find(typeof(TDocument).Name);
             if (existing != null) return;
-            col.InsertOne(new { Id = typeof(TDocument).Name, value = initialValue }.ToBsonDocument());
+            col.InsertOne(new {Id = typeof(TDocument).Name, value = initialValue}.ToBsonDocument());
         }
 
         //TODO: fix and uncomment
@@ -84,7 +89,6 @@ namespace Infrastructure.Extensions
         //            new RetryingInterceptor { RetryCount = retryCount, PauseBetweenCalls = pauseBetweenRetries });
         //    });
         //}
-
         //public static IMongoCollection<TDocument> GetRetryCollection<TColectionName, TDocument>(this IMongoDatabase db)
         //{
         //    var collectionName = typeof(TColectionName).Name;
@@ -93,17 +97,27 @@ namespace Infrastructure.Extensions
 
         public static UpdateResult UpdateById<T>(this IMongoCollection<T> collection, BsonValue id, Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>> update, UpdateOptions options = null)
         {
-            return collection.UpdateOne(Builders<T>.Filter.Eq(IdName, GetId<T>(id)), update(new UpdateDefinitionBuilder<T>()), options ?? new UpdateOptions());
+            return collection.UpdateOne(FilterId<T>(id), update(new UpdateDefinitionBuilder<T>()), options ?? new UpdateOptions());
         }
 
-          public static UpdateResult UpdateByIdOrInsert<T>(this IMongoCollection<T> collection, BsonValue id,
-             Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>> update) where T : new()
-         {
+        private static FilterDefinition<T> FilterId<T>(BsonValue id)
+        {
+            return Builders<T>.Filter.Eq(IdName, GetId<T>(id));
+        }
+
+        public static UpdateResult Update<T>(this IMongoCollection<T> collection, T entity, params Expression<Func<T, object>>[] fields)
+        {
+            return collection.UpdateOne(Builders<T>.Filter.Eq(IdName, entity.ToBsonDocument()[IdName]), UpdateHelper.GetUpdater(entity, fields));
+        }
+
+        public static UpdateResult UpdateByIdOrInsert<T>(this IMongoCollection<T> collection, BsonValue id,
+            Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>> update) where T : new()
+        {
             return collection.UpdateById(id, update, new UpdateOptions
             {
                 IsUpsert = true
             });
-         }
+        }
 
         public static UpdateResult UpdateArrayById<T, TItem>(this IMongoCollection<T> collection, BsonValue id,
             Expression<Func<T, IEnumerable<TItem>>> array, FilterDefinition<TItem> elemSelector,
@@ -111,13 +125,13 @@ namespace Infrastructure.Extensions
         {
             return collection.UpdateMany(
                 Builders<T>.Filter.And(
-                    Builders<T>.Filter.Eq(IdName, GetId<T>(id)),
+                    FilterId<T>(id),
                     QueryExtensions.ElemMatch(array,
                         elemSelector
-                        )
-                    ),
+                    )
+                ),
                 update(new UpdateDefinitionBuilder<T>(), array)
-                );
+            );
         }
 
         private static BsonValue GetId<T>(BsonValue id)
@@ -133,9 +147,9 @@ namespace Infrastructure.Extensions
         {
             if (options == null)
             {
-                options = new UpdateOptions { IsUpsert = true};
+                options = new UpdateOptions {IsUpsert = true};
             }
-            
+
             var doc = new BsonDocument();
             var wr = new BsonDocumentWriter(doc);
             BsonSerializer.Serialize(wr, prototype);

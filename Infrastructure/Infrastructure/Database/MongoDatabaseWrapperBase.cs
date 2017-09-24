@@ -9,6 +9,11 @@ namespace Infrastructure.Database
             Database = db;
         }
 
-        public IMongoDatabase Database { get; private set; }
+        public IMongoDatabase Database { get; }
+
+        protected IMongoCollection<T> GetCollection<T>()
+        {
+            return Database.GetCollection<T>(typeof(T).Name);
+        }
     }
 }
