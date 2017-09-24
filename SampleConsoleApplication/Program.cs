@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Infrastructure.Extensions;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
+using SampleConsoleApplication.Commands;
 using SampleConsoleApplication.Database;
 using SampleConsoleApplication.Database.Domain;
 
@@ -42,6 +43,10 @@ namespace SampleConsoleApplication
                 x => x.Comments,
                 QueryExtensions.EQ<Comment>(a => a.UserId, user.Id),
                 (builder, array) => builder.Set(array, c => c.Text, "new text"));
+
+            var count = new GetUserCommentsCountCommand(MongoInitializer).ByArticle(article.Id, user.Id);
+
+            Console.WriteLine(count);
         }
     }
 }

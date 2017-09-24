@@ -9,6 +9,6 @@ namespace SampleConsoleApplication.Database
     {
         public LogDatabase(IMongoDatabase db) : base(db) { }
 
-        public IMongoCollection<Log> Logs => Database.GetRetryCollection<Log>();
+        public IMongoCollection<Log> Logs => Database.GetCollection<Log>(typeof(Log).Name);
     }
 }

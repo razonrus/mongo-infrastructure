@@ -20,11 +20,11 @@ namespace Infrastructure.Extensions
 
         public static T FindOneById<T>(this IMongoCollection<T> col, BsonValue id)
         {
-            return col.Find(Builders<T>.Filter.Eq(IdName, id)).SingleOrDefault();
+            return col.Find(Builders<T>.Filter.Eq(IdName, GetId<T>(id))).SingleOrDefault();
         }
         public static DeleteResult RemoveById<T>(this IMongoCollection<T> col, BsonValue id)
         {
-            return col.DeleteOne(Builders<T>.Filter.Eq(IdName, id));
+            return col.DeleteOne(Builders<T>.Filter.Eq(IdName, GetId<T>(id)));
         }
         static readonly ConcurrentDictionary<string, object> cache = new ConcurrentDictionary<string, object>();
 
@@ -62,39 +62,38 @@ namespace Infrastructure.Extensions
             col.InsertOne(new { Id = typeof(TDocument).Name, value = initialValue }.ToBsonDocument());
         }
 
-        /// <summary>
-        /// Returns a IMongoCollection decorated with RetryingInterceptor in case of exception, if will retry the operation specified times with pause of specified ms.
-        /// </summary>
-        /// <typeparam name="TDocument"></typeparam>
-        /// <param name="db"></param>
-        /// <param name="collectionName"></param>
-        /// <param name="retryCount"></param>
-        /// <param name="pauseBetweenRetries"></param>
-        /// <returns></returns>
-        public static IMongoCollection<TDocument> GetRetryCollection<TDocument>(this IMongoDatabase db, string collectionName = null, int retryCount = 5, int pauseBetweenRetries = 2000)
-        {
-            var t = typeof(TDocument).Name;
-            if (collectionName == null) collectionName = t;
-            var key = string.Concat(db.DatabaseNamespace.DatabaseName, collectionName, t);
-            return (IMongoCollection<TDocument>)cache.GetOrAdd(key, k =>
-            {
-                var coll = db.GetCollection<TDocument>(collectionName);
-                return (IMongoCollection<TDocument>)ProxyGenerator.CreateClassProxyWithTarget(typeof(IMongoCollection<TDocument>), coll, new object[] { db, collectionName, coll.Settings }, 
-                    new RetryingInterceptor { RetryCount = retryCount, PauseBetweenCalls = pauseBetweenRetries });
-            });
-        }
+        //TODO: fix and uncomment
+        ///// <summary>
+        ///// Returns a IMongoCollection decorated with RetryingInterceptor in case of exception, if will retry the operation specified times with pause of specified ms.
+        ///// </summary>
+        ///// <typeparam name="TDocument"></typeparam>
+        ///// <param name="db"></param>
+        ///// <param name="collectionName"></param>
+        ///// <param name="retryCount"></param>
+        ///// <param name="pauseBetweenRetries"></param>
+        ///// <returns></returns>
+        //public static IMongoCollection<TDocument> GetRetryCollection<TDocument>(this IMongoDatabase db, string collectionName = null, int retryCount = 5, int pauseBetweenRetries = 2000)
+        //{
+        //    var t = typeof(TDocument).Name;
+        //    if (collectionName == null) collectionName = t;
+        //    var key = string.Concat(db.DatabaseNamespace.DatabaseName, collectionName, t);
+        //    return (IMongoCollection<TDocument>)cache.GetOrAdd(key, k =>
+        //    {
+        //        var coll = db.GetCollection<TDocument>(collectionName);
+        //        return (IMongoCollection<TDocument>)ProxyGenerator.CreateClassProxyWithTarget(coll.GetType(), coll, new object[] { db, collectionName, coll.Settings }, 
+        //            new RetryingInterceptor { RetryCount = retryCount, PauseBetweenCalls = pauseBetweenRetries });
+        //    });
+        //}
 
-        public static IMongoCollection<TDocument> GetRetryCollection<TColectionName, TDocument>(this IMongoDatabase db)
-        {
-            var collectionName = typeof(TColectionName).Name;
-            return GetRetryCollection<TDocument>(db, collectionName);
-        }
+        //public static IMongoCollection<TDocument> GetRetryCollection<TColectionName, TDocument>(this IMongoDatabase db)
+        //{
+        //    var collectionName = typeof(TColectionName).Name;
+        //    return GetRetryCollection<TDocument>(db, collectionName);
+        //}
 
         public static UpdateResult UpdateById<T>(this IMongoCollection<T> collection, BsonValue id, Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>> update, UpdateOptions options = null)
         {
-            id = GetId<T>(id);
-            
-            return collection.UpdateOne(Builders<T>.Filter.Eq(IdName, id), update(new UpdateDefinitionBuilder<T>()), options ?? new UpdateOptions());
+            return collection.UpdateOne(Builders<T>.Filter.Eq(IdName, GetId<T>(id)), update(new UpdateDefinitionBuilder<T>()), options ?? new UpdateOptions());
         }
 
           public static UpdateResult UpdateByIdOrInsert<T>(this IMongoCollection<T> collection, BsonValue id,
@@ -110,11 +109,9 @@ namespace Infrastructure.Extensions
             Expression<Func<T, IEnumerable<TItem>>> array, FilterDefinition<TItem> elemSelector,
             Func<UpdateDefinitionBuilder<T>, Expression<Func<T, IEnumerable<TItem>>>, UpdateDefinition<T>> update)
         {
-            id = GetId<T>(id);
-
             return collection.UpdateMany(
                 Builders<T>.Filter.And(
-                    Builders<T>.Filter.Eq("_id", id),
+                    Builders<T>.Filter.Eq(IdName, GetId<T>(id)),
                     QueryExtensions.ElemMatch(array,
                         elemSelector
                         )
