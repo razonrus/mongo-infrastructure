@@ -59,16 +59,24 @@ namespace SampleTests
         [Test]
         public void ByAuthorTest()
         {
-            var result = new Mock<IFindFluent<Article, Article>>();
-
+            var cursor = new Mock<IAsyncCursor<Article>>();
+            var isFirstMoveNext = true;
+            cursor.Setup(x => x.MoveNext(It.IsAny<CancellationToken>())).Returns(()=>
+            {
+                if (isFirstMoveNext)
+                {
+                    isFirstMoveNext = false;
+                    return true;
+                }
+                return false;
+            });
+            cursor.SetupGet(x => x.Current).Returns(new[] { CreateArticle() });
+            
             var mongoInitializer = new MockMongoWrapper<IMongoInitializer>()
                 .SetupDatabase(x => x.SampleDb, x => x
                     .SetupCollection<Article>(
-                        m => m.Setup(c => c.Find(It.IsAny<FilterDefinition<Article>>(), It.IsAny<FindOptions>()))
-                            .Returns(result.Object)
+                        m => m.Setup(c => c.FindSync(It.IsAny<FilterDefinition<Article>>(), It.IsAny<FindOptions<Article, Article>>(), It.IsAny<CancellationToken>())).Returns(cursor.Object)
                     ))
-                            //.Returns(() => new Mock<IFindFluent<Article>>())
-                           // new <Article>(m.Object, new List<Article> {CreateArticle()}))))
                .Object;
 
             var count = new GetUserCommentsCountCommand(mongoInitializer).ByAuthor(2, 1);
