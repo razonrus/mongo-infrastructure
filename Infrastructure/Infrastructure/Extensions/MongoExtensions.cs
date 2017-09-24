@@ -107,7 +107,7 @@ namespace Infrastructure.Extensions
          }
 
         public static UpdateResult UpdateArrayById<T, TItem>(this IMongoCollection<T> collection, BsonValue id,
-            Expression<Func<T, IEnumerable<TItem>>> array, FilterDefinition<T> elemSelector,
+            Expression<Func<T, IEnumerable<TItem>>> array, FilterDefinition<TItem> elemSelector,
             Func<UpdateDefinitionBuilder<T>, Expression<Func<T, IEnumerable<TItem>>>, UpdateDefinition<T>> update)
         {
             id = GetId<T>(id);

@@ -9,7 +9,7 @@ namespace Infrastructure.Extensions
 {
     public static class QueryExtensions
     {
-        public static FilterDefinition<T> ElemMatch<T, TItem>(Expression<Func<T, IEnumerable<TItem>>> expression, FilterDefinition<T> query)
+        public static FilterDefinition<T> ElemMatch<T, TItem>(Expression<Func<T, IEnumerable<TItem>>> expression, FilterDefinition<TItem> query)
         {
             return Builders<T>.Filter.ElemMatch(PropertyHelper.GetName(expression), query);
         }
