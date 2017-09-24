@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>MongoDbInfrastructure</id>
-    <version>1.0.1.0</version>
+    <version>2.0.0.0-alpha</version>
 	 <title>MongoDbInfrastructure</title>
     <authors>razon</authors>
     <owners>razon</owners>
@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Extensions for mongodb driver, Infrastructure for use MongoDB</description>
     <releaseNotes>First version of nuget package.</releaseNotes>
-    <copyright>Copyright 2015</copyright>
+    <copyright>Copyright 2017</copyright>
     <tags>mongodb</tags>
   </metadata>
 </package>
