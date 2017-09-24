@@ -57,7 +57,6 @@
   <ItemGroup>
     <Compile Include="MockMongoDatabaseWrapper.cs" />
     <Compile Include="MockMongoWrapper.cs" />
-    <Compile Include="MongoCursorStub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

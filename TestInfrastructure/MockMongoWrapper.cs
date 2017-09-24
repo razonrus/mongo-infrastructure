@@ -10,19 +10,12 @@ namespace TestInfrastructure
 {
     public class MockMongoWrapper<TInitializer> where TInitializer : class
     {
-        //private readonly Mock<MongoServer> server;
         private readonly Mock<MongoClient> client;
         private readonly Mock<TInitializer> mock;
 
         public MockMongoWrapper()
         {
-            string message;
-            //server = new Mock<MongoServer>(new MongoServerSettings());
-            //server.Setup(s => s.IsDatabaseNameValid(It.IsAny<string>(), out message)).Returns(true);
-            //server.SetupGet(x => x.Settings).Returns(new MongoServerSettings());
-
             client = new Mock<MongoClient>();
-            //client.Setup(s => s.IsDatabaseNameValid(It.IsAny<string>(), out message)).Returns(true);
             client.SetupGet(x => x.Settings).Returns(new MongoClientSettings());
 
             mock = new Mock<TInitializer>();
@@ -39,12 +32,8 @@ namespace TestInfrastructure
                 WriteEncoding = new UTF8Encoding()
             };
             var database = new Mock<IMongoDatabase>();
-            string message;
-            //database.Setup(x => x.IsCollectionNameValid(It.IsAny<string>(), out message)).Returns(true);
-            //database.SetupGet(x => x.Server).Returns(server.Object);
             database.SetupGet(x => x.Settings).Returns(mongoDatabaseSettings);
             database.SetupGet(x => x.DatabaseNamespace).Returns(new DatabaseNamespace(typeof(T).Name));
-            //database.SetupGet(x => x.Name).Returns("test");
             return database;
         }
 

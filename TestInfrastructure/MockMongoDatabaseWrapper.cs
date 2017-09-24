@@ -27,8 +27,7 @@ namespace TestInfrastructure
                 WriteEncoding = new UTF8Encoding(),
                 ReadConcern = new ReadConcern()
             };
-
-            //var collection = new Mock<IMongoCollection<T>>(database.Object, "test", mongoCollectionSettings);
+            
             var collection = new Mock<IMongoCollection<T>>();
             collection.Setup(x => x.UpdateOne(It.IsAny<FilterDefinition<T>>(), It.IsAny<UpdateDefinition<T>>(), It.IsAny<UpdateOptions>(), It.IsAny<CancellationToken>())).Returns((UpdateResult)null);
 
