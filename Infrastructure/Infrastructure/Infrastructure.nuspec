@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/razonrus/mongo-infrastructure</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Extensions for mongodb driver, Infrastructure for use MongoDB</description>
-    <releaseNotes>First version of nuget package.</releaseNotes>
+    <releaseNotes>Removed dependency from legacy mongocsharpdriver</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>mongodb</tags>
   </metadata>
